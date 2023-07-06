@@ -38,28 +38,6 @@ import org.slf4j.LoggerFactory;
 public class LambdaHandler
     implements RequestHandler<Object, String> {
 
-
-  private static class ExitTrappedException extends SecurityException {
-
-  }
-
-  // does not work
-  private static void forbidSystemExitCall() {
-    final SecurityManager securityManager = new SecurityManager() {
-      public void checkPermission(Permission permission) {
-        if ("exitVM".equals(permission.getName())) {
-          throw new ExitTrappedException();
-        }
-      }
-    };
-    System.setSecurityManager(securityManager);
-  }
-
-  private static void enableSystemExitCall() {
-    System.setSecurityManager( null ) ;
-  }
-
-
   static class UserParameters {
 
     public String stage;
@@ -171,9 +149,6 @@ public class LambdaHandler
 
     logger.info("Calling PolicyEvaluatorCli.main(args)");
     try {
-      logger.info("Forbid system exit call!");
-      forbidSystemExitCall();
-
       // apparently we can't do this and we need to call in a separate process
       // PolicyEvaluatorCli.main(args);
 
