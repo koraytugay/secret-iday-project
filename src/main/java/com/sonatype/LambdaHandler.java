@@ -4,6 +4,8 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.AWSCodePipelineClientBuilder;
+import com.amazonaws.services.codepipeline.model.FailureDetails;
+import com.amazonaws.services.codepipeline.model.FailureType;
 import com.amazonaws.services.codepipeline.model.PutJobFailureResultRequest;
 import com.amazonaws.services.codepipeline.model.PutJobSuccessResultRequest;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -234,6 +236,12 @@ public class LambdaHandler
     if ("Failure".equalsIgnoreCase(resultDto.policyAction)) {
       PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
       putJobFailureResultRequest.setJobId(jobId);
+
+      FailureDetails failureDetails = new FailureDetails();
+      failureDetails.setType(FailureType.JobFailed);
+      failureDetails.setMessage("Failed due to policy violations");
+      putJobFailureResultRequest.setFailureDetails(failureDetails);
+
       AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
       awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
     }
