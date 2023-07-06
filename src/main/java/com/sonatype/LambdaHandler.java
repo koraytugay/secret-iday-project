@@ -13,18 +13,20 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.gson.Gson;
-import com.sonatype.insight.scan.cli.PolicyEvaluatorCli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Permission;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +41,8 @@ public class LambdaHandler
 
   }
 
+  // does not work
   private static void forbidSystemExitCall() {
-    // does not work
     final SecurityManager securityManager = new SecurityManager() {
       public void checkPermission(Permission permission) {
         if ("exitVM".equals(permission.getName())) {
@@ -169,7 +171,27 @@ public class LambdaHandler
     try {
       logger.info("Forbid system exit call!");
       forbidSystemExitCall();
-      PolicyEvaluatorCli.main(args);
+
+      // apparently we can't do this and we need to call in a separate process
+      // PolicyEvaluatorCli.main(args);
+
+      // nexus-iq-cli.jar is in: /var/task/lib/nexus-iq-cli-1.164.0-01.jar
+      List<String> command = new LinkedList<>();
+      command.add("java");
+      command.add("-jar");
+      command.add("/var/task/lib/nexus-iq-cli-1.164.0-01.jar");
+      command.addAll(Arrays.stream(args).collect(Collectors.toList()));
+
+      logger.info("Calling new ProcessBuilder(command)");
+      ProcessBuilder builder = new ProcessBuilder(command);
+
+      logger.info("Calling builder.inheritIO().start()");
+      Process process = builder.inheritIO().start();
+      logger.info("Called builder.inheritIO().start()");
+
+      logger.info("Calling process.waitFor()");
+      process.waitFor();
+      logger.info("Called process.waitFor()");
     }
     catch (Exception e)
     {
@@ -209,7 +231,7 @@ public class LambdaHandler
     String jobId = (String) codePipelineJob.get("id");
     logger.info("job id is: {}", jobId);
 
-    if ("fail".equalsIgnoreCase(resultDto.policyAction)) {
+    if ("Failure".equalsIgnoreCase(resultDto.policyAction)) {
       PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
       putJobFailureResultRequest.setJobId(jobId);
       AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
