@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Permission;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -32,6 +31,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
 // https://github.com/awsdocs/aws-lambda-developer-guide/blob/main/sample-apps/s3-java/src/main/java/example/Handler.java
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/AuthUsingTempSessionToken.html
@@ -121,7 +124,12 @@ public class LambdaHandler
     }
 
     String iqServerUrl = System.getenv("IQ_SERVER_URL");
-    String iqServerCredentials = System.getenv("IQ_SERVER_CREDENTIALS");
+
+    String secretFromSecretManager = getSecret();
+
+    String iqServerCredentials = secretFromSecretManager;
+
+    logger.info("Secret from AWS Secret Manager: {}", secretFromSecretManager);
 
     LinkedHashMap<String, Object> actionConfiguration = (LinkedHashMap<String, Object>) data.get("actionConfiguration");
     LinkedHashMap<String, Object> configuration = (LinkedHashMap<String, Object>) actionConfiguration.get("configuration");
@@ -235,6 +243,30 @@ public class LambdaHandler
     GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
     S3Object object = s3Client.getObject(getObjectRequest);
     return object.getObjectContent();
+  }
+
+  public String getSecret() {
+    String secretName = System.getenv("IQ_SERVER_CREDENTIALS");
+
+    // Create a Secrets Manager client
+    SecretsManagerClient client = SecretsManagerClient.builder()
+        .region(Region.US_EAST_1)
+        .build();
+
+    GetSecretValueRequest getSecretValueRequest = GetSecretValueRequest.builder().secretId(secretName).build();
+
+    GetSecretValueResponse getSecretValueResponse;
+
+    try {
+      getSecretValueResponse = client.getSecretValue(getSecretValueRequest);
+    } catch (Exception e) {
+      // For a list of exceptions thrown, see
+      // https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+      throw e;
+    }
+
+    String secret = getSecretValueResponse.secretString();
+    return secret;
   }
 
   static class ResultDto {
