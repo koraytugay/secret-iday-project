@@ -21,6 +21,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.security.Permission;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +33,12 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.UUID;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +121,7 @@ public class LambdaHandler
 
     InputStream s3ObjectInputStream = getObject(s3Client, srcBucket, srcKey);
 
-    File targetZip = null;
+    File targetZip;
     try {
       targetZip = File.createTempFile("temp-", ".zip");
       targetZip.deleteOnExit();
@@ -121,6 +132,7 @@ public class LambdaHandler
       logger.info("temp file length:" + targetZip.length());
     } catch (IOException e) {
       logger.info("Uppss! Could not create temp file!");
+      throw new RuntimeException(e);
     }
 
     String iqServerUrl = System.getenv("IQ_SERVER_URL");
@@ -152,8 +164,22 @@ public class LambdaHandler
     String resultsFileAbsolutePath = resultsFile.getAbsolutePath();
     logger.info("Results file path:" + resultsFileAbsolutePath);
 
-    String targetZipPath = targetZip.getAbsolutePath();
-    String[] args = {"-r", resultsFileAbsolutePath, "-t", userParameters.stage, "-i", userParameters.applicationId, "-s", iqServerUrl, "-a", iqServerCredentials, targetZipPath};
+    File scanDir;
+    try {
+      scanDir = ZipExtractor.extract(targetZip);
+    }
+    catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    String[] args = {
+        "-r", resultsFileAbsolutePath,
+        "-t", userParameters.stage,
+        "-i", userParameters.applicationId,
+        "-s", iqServerUrl,
+        "-a", iqServerCredentials,
+        scanDir.getAbsolutePath()
+    };
 
     logger.info("Calling PolicyEvaluatorCli.main(args)");
     try {
@@ -210,7 +236,13 @@ public class LambdaHandler
     logger.info("Printing resultDto");
     logger.info("" + resultDto);
 
-
+    try {
+      // delete exploded zip directory
+      ZipExtractor.deleteDirectoryWithContent(scanDir);
+    }
+    catch (IOException e) {
+      logger.info("Could not delete extracted zip files");
+    }
 
     // This is where we want to set the job results
     String jobId = (String) codePipelineJob.get("id");
