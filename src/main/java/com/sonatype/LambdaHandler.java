@@ -2,6 +2,10 @@ package com.sonatype;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.services.codepipeline.AWSCodePipeline;
+import com.amazonaws.services.codepipeline.AWSCodePipelineClientBuilder;
+import com.amazonaws.services.codepipeline.model.ExecutionDetails;
+import com.amazonaws.services.codepipeline.model.PutJobSuccessResultRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.s3.AmazonS3;
@@ -125,6 +129,19 @@ public class LambdaHandler
     String absolutePath = tempFile.getAbsolutePath();
     String[] args = {"-t", userParameters.stage, "-i", userParameters.applicationId, "-s", iqServerUrl, "-a", iqServerCredentials, absolutePath};
     PolicyEvaluatorCli.main(args);
+
+
+
+    // This is where we want to set the job results
+    String jobId = (String) codePipelineJob.get("id");
+    logger.info("job id is: {}", jobId);
+    PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
+    jobSuccessResultRequest.setJobId(jobId);
+    AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+    awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
+
+
+
     return "SUCCESS";
   }
 
