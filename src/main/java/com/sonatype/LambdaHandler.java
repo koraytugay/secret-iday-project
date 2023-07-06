@@ -4,7 +4,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.AWSCodePipelineClientBuilder;
-import com.amazonaws.services.codepipeline.model.ExecutionDetails;
+import com.amazonaws.services.codepipeline.model.PutJobFailureResultRequest;
 import com.amazonaws.services.codepipeline.model.PutJobSuccessResultRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -15,12 +15,15 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.google.gson.Gson;
 import com.sonatype.insight.scan.cli.PolicyEvaluatorCli;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Permission;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -30,6 +33,28 @@ import org.slf4j.LoggerFactory;
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/AuthUsingTempSessionToken.html
 public class LambdaHandler
     implements RequestHandler<Object, String> {
+
+
+  private static class ExitTrappedException extends SecurityException {
+
+  }
+
+  private static void forbidSystemExitCall() {
+    // does not work
+    final SecurityManager securityManager = new SecurityManager() {
+      public void checkPermission(Permission permission) {
+        if ("exitVM".equals(permission.getName())) {
+          throw new ExitTrappedException();
+        }
+      }
+    };
+    System.setSecurityManager(securityManager);
+  }
+
+  private static void enableSystemExitCall() {
+    System.setSecurityManager( null ) ;
+  }
+
 
   static class UserParameters {
 
@@ -100,15 +125,15 @@ public class LambdaHandler
 
     InputStream s3ObjectInputStream = getObject(s3Client, srcBucket, srcKey);
 
-    File tempFile = null;
+    File targetZip = null;
     try {
-      tempFile = File.createTempFile("temp-", ".zip");
-      tempFile.deleteOnExit();
-      FileOutputStream out = new FileOutputStream(tempFile);
+      targetZip = File.createTempFile("temp-", ".zip");
+      targetZip.deleteOnExit();
+      FileOutputStream out = new FileOutputStream(targetZip);
       IOUtils.copy(s3ObjectInputStream, out);
       logger.info("temp file generated");
-      logger.info("temp file path:" + tempFile.getAbsolutePath());
-      logger.info("temp file length:" + tempFile.length());
+      logger.info("temp file path:" + targetZip.getAbsolutePath());
+      logger.info("temp file length:" + targetZip.length());
     } catch (IOException e) {
       logger.info("Uppss! Could not create temp file!");
     }
@@ -126,22 +151,78 @@ public class LambdaHandler
     logger.info("applicationId:" + userParameters.applicationId);
     logger.info("stage:" + userParameters.stage);
 
-    String absolutePath = tempFile.getAbsolutePath();
-    String[] args = {"-t", userParameters.stage, "-i", userParameters.applicationId, "-s", iqServerUrl, "-a", iqServerCredentials, absolutePath};
-    PolicyEvaluatorCli.main(args);
+    // Results file
+    File resultsFile;
+    try {
+      resultsFile = File.createTempFile("results", ".json");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    String resultsFileAbsolutePath = resultsFile.getAbsolutePath();
+    logger.info("Results file path:" + resultsFileAbsolutePath);
+
+    String targetZipPath = targetZip.getAbsolutePath();
+    String[] args = {"-r", resultsFileAbsolutePath, "-t", userParameters.stage, "-i", userParameters.applicationId, "-s", iqServerUrl, "-a", iqServerCredentials, targetZipPath};
+
+    logger.info("Calling PolicyEvaluatorCli.main(args)");
+    try {
+      logger.info("Forbid system exit call!");
+      forbidSystemExitCall();
+      PolicyEvaluatorCli.main(args);
+    }
+    catch (Exception e)
+    {
+      logger.info("Why does main throw exception when policy violation fails..");
+      logger.info("I can read it from results file myself..");
+      logger.info("Does not make sense to me...");
+    }
+    // continue even if we have policyAction:fail
+    // I will make the pipeline fail by calling another method
+
+    logger.info("Called PolicyEvaluatorCli.main(args)");
+
+    StringBuilder stringBuilder = new StringBuilder();
+    logger.info("Printing results file..");
+    // Print results file
+    Scanner scanner = null;
+    try {
+      scanner = new Scanner(resultsFile);
+      while (scanner.hasNext()) {
+        stringBuilder.append(scanner.next());
+      }
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
+    String resultsJson = stringBuilder.toString();
+    logger.info(resultsJson);
+    logger.info("Printed resultsJson..");
+
+    ResultDto resultDto = new Gson().fromJson(resultsJson, ResultDto.class);
+    logger.info("Printing resultDto");
+    logger.info("" + resultDto);
 
 
 
     // This is where we want to set the job results
     String jobId = (String) codePipelineJob.get("id");
     logger.info("job id is: {}", jobId);
-    PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
-    jobSuccessResultRequest.setJobId(jobId);
-    AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
-    awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
 
+    if ("fail".equalsIgnoreCase(resultDto.policyAction)) {
+      PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
+      putJobFailureResultRequest.setJobId(jobId);
+      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+      awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
+    }
+    else {
+      PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
+      jobSuccessResultRequest.setJobId(jobId);
+      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+      awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
+    }
 
-
+    logger.info("Returning");
     return "SUCCESS";
   }
 
@@ -149,5 +230,17 @@ public class LambdaHandler
     GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
     S3Object object = s3Client.getObject(getObjectRequest);
     return object.getObjectContent();
+  }
+
+  static class ResultDto {
+
+    public String policyAction;
+
+    @Override
+    public String toString() {
+      return "ResultDto{" +
+          "policyAction='" + policyAction + '\'' +
+          '}';
+    }
   }
 }

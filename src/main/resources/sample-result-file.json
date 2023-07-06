@@ -1,0 +1,1157 @@
+{
+  "applicationId": "test",
+  "scanId": "5928f533de0a4412bde9777656df2170",
+  "reportHtmlUrl": "https://da66-142-189-232-205.ngrok-free.app/ui/links/application/test/report/5928f533de0a4412bde9777656df2170",
+  "reportPdfUrl": "https://da66-142-189-232-205.ngrok-free.app/ui/links/application/test/report/5928f533de0a4412bde9777656df2170/pdf",
+  "reportDataUrl": "https://da66-142-189-232-205.ngrok-free.app/api/v2/applications/test/reports/5928f533de0a4412bde9777656df2170/raw",
+  "policyAction": "None",
+  "policyEvaluationResult": {
+    "alerts": [
+      {
+        "trigger": {
+          "policyId": "82126d4692524339b3cfe25939b5762a",
+          "policyName": "Component-Unknown",
+          "threatLevel": 2,
+          "policyViolationId": "e3ab499ad26b4271bed78cee20abeb1d",
+          "componentFacts": [
+            {
+              "componentIdentifier": null,
+              "hash": "7fb28eea495dca6f9d82",
+              "constraintFacts": [
+                {
+                  "constraintId": "66f39d3b64c044509e0894abe03d2552",
+                  "constraintName": "Unknown3rdpartycomponent",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "MatchState",
+                      "conditionIndex": 0,
+                      "summary": "MatchStateisunknown",
+                      "reason": "Matchstatewas'Unknown'",
+                      "reference": null,
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "Proprietary",
+                      "conditionIndex": 0,
+                      "summary": "Proprietaryisfalse",
+                      "reason": "Componentdoesnotcontainproprietarypackages",
+                      "reference": null,
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "DataSource",
+                      "conditionIndex": 0,
+                      "summary": "DataSourcehassupportforidentity",
+                      "reason": "DataSourcehassupportforIdentity",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": null
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "82126d4692524339b3cfe25939b5762a",
+          "policyName": "Component-Unknown",
+          "threatLevel": 2,
+          "policyViolationId": "4239dd9ea7404b74885a514374bfed9c",
+          "componentFacts": [
+            {
+              "componentIdentifier": null,
+              "hash": "07575b2757eaac3dc64f",
+              "constraintFacts": [
+                {
+                  "constraintId": "66f39d3b64c044509e0894abe03d2552",
+                  "constraintName": "Unknown3rdpartycomponent",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "MatchState",
+                      "conditionIndex": 0,
+                      "summary": "MatchStateisunknown",
+                      "reason": "Matchstatewas'Unknown'",
+                      "reference": null,
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "Proprietary",
+                      "conditionIndex": 0,
+                      "summary": "Proprietaryisfalse",
+                      "reason": "Componentdoesnotcontainproprietarypackages",
+                      "reference": null,
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "DataSource",
+                      "conditionIndex": 0,
+                      "summary": "DataSourcehassupportforidentity",
+                      "reason": "DataSourcehassupportforIdentity",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": null
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "270aa38432614ee7b5b0a0b081ff3a2f",
+          "policyName": "Security-Medium",
+          "threatLevel": 7,
+          "policyViolationId": "84285a8744dc4987b929f7bec285a726",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jersey-media-jaxb",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "org.glassfish.jersey.media",
+                  "version": "2.29.1"
+                }
+              },
+              "hash": "53f22b94254ff781667b",
+              "constraintFacts": [
+                {
+                  "constraintId": "85fe10e1979b44bdbca496d8e0c8f3f4",
+                  "constraintName": "MediumriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=4",
+                      "reason": "Foundsecurityvulnerabilitysonatype-2016-0687withseverity>=4(severity=6.5)",
+                      "reference": {
+                        "value": "sonatype-2016-0687",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<7",
+                      "reason": "Foundsecurityvulnerabilitysonatype-2016-0687withseverity<7(severity=6.5)",
+                      "reference": {
+                        "value": "sonatype-2016-0687",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "org.glassfish.jersey.media"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jersey-media-jaxb"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.29.1"
+                  }
+                ],
+                "name": "jersey-media-jaxb"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "270aa38432614ee7b5b0a0b081ff3a2f",
+          "policyName": "Security-Medium",
+          "threatLevel": 7,
+          "policyViolationId": "afa56842f3e14c77a2d2f2e37977c713",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-databind",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "d6eb9817d9c7289a91f0",
+              "constraintFacts": [
+                {
+                  "constraintId": "85fe10e1979b44bdbca496d8e0c8f3f4",
+                  "constraintName": "MediumriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=4",
+                      "reason": "FoundsecurityvulnerabilityCVE-2019-12384withseverity>=4(severity=5.9)",
+                      "reference": {
+                        "value": "CVE-2019-12384",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2019-12384withseverity<7(severity=5.9)",
+                      "reference": {
+                        "value": "CVE-2019-12384",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-databind"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-databind"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "270aa38432614ee7b5b0a0b081ff3a2f",
+          "policyName": "Security-Medium",
+          "threatLevel": 7,
+          "policyViolationId": "89f4dd67624b482b8a2153e4ee112b69",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-databind",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "d6eb9817d9c7289a91f0",
+              "constraintFacts": [
+                {
+                  "constraintId": "85fe10e1979b44bdbca496d8e0c8f3f4",
+                  "constraintName": "MediumriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=4",
+                      "reason": "FoundsecurityvulnerabilityCVE-2019-12814withseverity>=4(severity=5.9)",
+                      "reference": {
+                        "value": "CVE-2019-12814",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2019-12814withseverity<7(severity=5.9)",
+                      "reference": {
+                        "value": "CVE-2019-12814",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-databind"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-databind"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "270aa38432614ee7b5b0a0b081ff3a2f",
+          "policyName": "Security-Medium",
+          "threatLevel": 7,
+          "policyViolationId": "ebac91a4d69f4bf48f64b4a50b819e54",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jersey-common",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "org.glassfish.jersey.core",
+                  "version": "2.29.1"
+                }
+              },
+              "hash": "ea60b9ace56f1ae758c2",
+              "constraintFacts": [
+                {
+                  "constraintId": "85fe10e1979b44bdbca496d8e0c8f3f4",
+                  "constraintName": "MediumriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=4",
+                      "reason": "FoundsecurityvulnerabilityCVE-2021-28168withseverity>=4(severity=5.5)",
+                      "reference": {
+                        "value": "CVE-2021-28168",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2021-28168withseverity<7(severity=5.5)",
+                      "reference": {
+                        "value": "CVE-2021-28168",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "org.glassfish.jersey.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jersey-common"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.29.1"
+                  }
+                ],
+                "name": "jersey-common"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "c3b32b92f71e4e438a4a424a6fa4b5ca",
+          "policyName": "Architecture-Quality",
+          "threatLevel": 1,
+          "policyViolationId": "1bc76e6c5ec744d49c7dcafc69ab5cb1",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jersey-client",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "org.glassfish.jersey.core",
+                  "version": "2.29.1"
+                }
+              },
+              "hash": "1635f245b7e9eecf8d3d",
+              "constraintFacts": [
+                {
+                  "constraintId": "59a585614049441e85076458a05c20d6",
+                  "constraintName": "Versionisunpopular",
+                  "operatorName": "OR",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "RelativePopularity",
+                      "conditionIndex": 0,
+                      "summary": "RelativePopularity(Percentage)<=10",
+                      "reason": "Relativepopularitywas<=10%(relativepopularity=10%)",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "org.glassfish.jersey.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jersey-client"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.29.1"
+                  }
+                ],
+                "name": "jersey-client"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "c3b32b92f71e4e438a4a424a6fa4b5ca",
+          "policyName": "Architecture-Quality",
+          "threatLevel": 1,
+          "policyViolationId": "02be672d59bd4401a6c2fb2db8975716",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-annotations",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "2ea299c145207161c212",
+              "constraintFacts": [
+                {
+                  "constraintId": "59a585614049441e85076458a05c20d6",
+                  "constraintName": "Versionisunpopular",
+                  "operatorName": "OR",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "RelativePopularity",
+                      "conditionIndex": 0,
+                      "summary": "RelativePopularity(Percentage)<=10",
+                      "reason": "Relativepopularitywas<=10%(relativepopularity=8%)",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-annotations"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-annotations"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "c3b32b92f71e4e438a4a424a6fa4b5ca",
+          "policyName": "Architecture-Quality",
+          "threatLevel": 1,
+          "policyViolationId": "b5e856297f3c4338b8f77151a6e4e9b0",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jersey-container-servlet-core",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "org.glassfish.jersey.containers",
+                  "version": "2.29.1"
+                }
+              },
+              "hash": "374a2d5702b46d0c14c6",
+              "constraintFacts": [
+                {
+                  "constraintId": "59a585614049441e85076458a05c20d6",
+                  "constraintName": "Versionisunpopular",
+                  "operatorName": "OR",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "RelativePopularity",
+                      "conditionIndex": 0,
+                      "summary": "RelativePopularity(Percentage)<=10",
+                      "reason": "Relativepopularitywas<=10%(relativepopularity=10%)",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "org.glassfish.jersey.containers"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jersey-container-servlet-core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.29.1"
+                  }
+                ],
+                "name": "jersey-container-servlet-core"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "c3b32b92f71e4e438a4a424a6fa4b5ca",
+          "policyName": "Architecture-Quality",
+          "threatLevel": 1,
+          "policyViolationId": "ea1f3b1554074428bcdd6b9147b656d4",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "javassist",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "org.javassist",
+                  "version": "3.22.0-CR2"
+                }
+              },
+              "hash": "44eaf0990dea92f4bca4",
+              "constraintFacts": [
+                {
+                  "constraintId": "9641b23dbf4742d599fd4377beb0d8b0",
+                  "constraintName": "Versionisold",
+                  "operatorName": "OR",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "AgeInDays",
+                      "conditionIndex": 0,
+                      "summary": "Ageolderthan1825days",
+                      "reason": "Foundcomponentolderthan5years",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "org.javassist"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "javassist"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "3.22.0-CR2"
+                  }
+                ],
+                "name": "javassist"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "c3b32b92f71e4e438a4a424a6fa4b5ca",
+          "policyName": "Architecture-Quality",
+          "threatLevel": 1,
+          "policyViolationId": "ada16030149143dfb0a572260ce9f659",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jersey-container-servlet",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "org.glassfish.jersey.containers",
+                  "version": "2.29.1"
+                }
+              },
+              "hash": "e04bec5a21eb88f098b6",
+              "constraintFacts": [
+                {
+                  "constraintId": "59a585614049441e85076458a05c20d6",
+                  "constraintName": "Versionisunpopular",
+                  "operatorName": "OR",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "RelativePopularity",
+                      "conditionIndex": 0,
+                      "summary": "RelativePopularity(Percentage)<=10",
+                      "reason": "Relativepopularitywas<=10%(relativepopularity=8%)",
+                      "reference": null,
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "org.glassfish.jersey.containers"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jersey-container-servlet"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.29.1"
+                  }
+                ],
+                "name": "jersey-container-servlet"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "e529564bf270416b90e1ca4832cce7cc",
+          "policyName": "Security-High",
+          "threatLevel": 9,
+          "policyViolationId": "07cb81ef7e2a4b078e274f5bfcc0a2de",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-core",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "bfff5af9fb8347d26bbb",
+              "constraintFacts": [
+                {
+                  "constraintId": "7555889bbd704c06bba95a48ad0742e6",
+                  "constraintName": "HighriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=7",
+                      "reason": "Foundsecurityvulnerabilitysonatype-2022-6438withseverity>=7(severity=7.5)",
+                      "reference": {
+                        "value": "sonatype-2022-6438",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<9",
+                      "reason": "Foundsecurityvulnerabilitysonatype-2022-6438withseverity<9(severity=7.5)",
+                      "reference": {
+                        "value": "sonatype-2022-6438",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-core"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "e529564bf270416b90e1ca4832cce7cc",
+          "policyName": "Security-High",
+          "threatLevel": 9,
+          "policyViolationId": "4444cc7a97774d7ea713de940fd4ceb8",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-databind",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "d6eb9817d9c7289a91f0",
+              "constraintFacts": [
+                {
+                  "constraintId": "7555889bbd704c06bba95a48ad0742e6",
+                  "constraintName": "HighriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2020-25649withseverity>=7(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2020-25649",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<9",
+                      "reason": "FoundsecurityvulnerabilityCVE-2020-25649withseverity<9(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2020-25649",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-databind"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-databind"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "e529564bf270416b90e1ca4832cce7cc",
+          "policyName": "Security-High",
+          "threatLevel": 9,
+          "policyViolationId": "9fe571835c2a40388d71597a65d6f126",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-databind",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "d6eb9817d9c7289a91f0",
+              "constraintFacts": [
+                {
+                  "constraintId": "7555889bbd704c06bba95a48ad0742e6",
+                  "constraintName": "HighriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2020-36518withseverity>=7(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2020-36518",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<9",
+                      "reason": "FoundsecurityvulnerabilityCVE-2020-36518withseverity<9(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2020-36518",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-databind"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-databind"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "e529564bf270416b90e1ca4832cce7cc",
+          "policyName": "Security-High",
+          "threatLevel": 9,
+          "policyViolationId": "0bcf9cd9a58a4d6e9b4255d90b11bd32",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-databind",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "d6eb9817d9c7289a91f0",
+              "constraintFacts": [
+                {
+                  "constraintId": "7555889bbd704c06bba95a48ad0742e6",
+                  "constraintName": "HighriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2022-42003withseverity>=7(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2022-42003",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<9",
+                      "reason": "FoundsecurityvulnerabilityCVE-2022-42003withseverity<9(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2022-42003",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-databind"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-databind"
+              }
+            }
+          ]
+        },
+        "actions": []
+      },
+      {
+        "trigger": {
+          "policyId": "e529564bf270416b90e1ca4832cce7cc",
+          "policyName": "Security-High",
+          "threatLevel": 9,
+          "policyViolationId": "ed080e2a916240c4938289031942ba02",
+          "componentFacts": [
+            {
+              "componentIdentifier": {
+                "format": "maven",
+                "coordinates": {
+                  "artifactId": "jackson-databind",
+                  "classifier": "",
+                  "extension": "jar",
+                  "groupId": "com.fasterxml.jackson.core",
+                  "version": "2.9.9"
+                }
+              },
+              "hash": "d6eb9817d9c7289a91f0",
+              "constraintFacts": [
+                {
+                  "constraintId": "7555889bbd704c06bba95a48ad0742e6",
+                  "constraintName": "HighriskCVSSscore",
+                  "operatorName": "AND",
+                  "conditionFacts": [
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity>=7",
+                      "reason": "FoundsecurityvulnerabilityCVE-2022-42004withseverity>=7(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2022-42004",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    },
+                    {
+                      "conditionTypeId": "SecurityVulnerabilitySeverity",
+                      "conditionIndex": 0,
+                      "summary": "SecurityVulnerabilitySeverity<9",
+                      "reason": "FoundsecurityvulnerabilityCVE-2022-42004withseverity<9(severity=7.5)",
+                      "reference": {
+                        "value": "CVE-2022-42004",
+                        "type": "SECURITY_VULNERABILITY_REFID"
+                      },
+                      "triggerJson": null
+                    }
+                  ]
+                }
+              ],
+              "pathnames": [],
+              "displayName": {
+                "parts": [
+                  {
+                    "field": "Group",
+                    "value": "com.fasterxml.jackson.core"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Artifact",
+                    "value": "jackson-databind"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "field": "Version",
+                    "value": "2.9.9"
+                  }
+                ],
+                "name": "jackson-databind"
+              }
+            }
+          ]
+        },
+        "actions": []
+      }
+    ],
+    "affectedComponentCount": 6,
+    "criticalComponentCount": 2,
+    "severeComponentCount": 2,
+    "moderateComponentCount": 2,
+    "criticalPolicyViolationCount": 5,
+    "severePolicyViolationCount": 4,
+    "moderatePolicyViolationCount": 2,
+    "grandfatheredPolicyViolationCount": 0,
+    "totalComponentCount": 25
+  }
+}
