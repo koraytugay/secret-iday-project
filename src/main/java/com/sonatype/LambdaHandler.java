@@ -1,17 +1,12 @@
 package com.sonatype;
 
-import com.amazonaws.services.codepipeline.model.Job;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.google.gson.Gson;
 import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
 import com.sonatype.nexus.api.iq.PolicyAlert;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,58 +26,18 @@ public class LambdaHandler
 
   @Override
   public Void handleRequest(Object obj, Context context) {
-    logger.info("Object: {}", obj);
+    logger.info("" + obj);
+    InputHandlerService inputHandlerService = new InputHandlerService();
     AwsService awsService = new AwsService();
-
-    LinkedHashMap<Object, Object> input = (LinkedHashMap<Object, Object>) obj;
-    Set<Entry<Object, Object>> entries = input.entrySet();
-    logger.info("entries size:" + entries.size());
-    for (Entry<Object, Object> entry : entries) {
-      logger.info("" + entry.getKey().getClass());
-      logger.info("" + entry.getKey());
-
-      logger.info("" + entry.getValue().getClass());
-      logger.info("" + entry.getValue());
-    }
-
-    Entry<Object, Object> next = entries.iterator().next();
-    LinkedHashMap<String, Object> codePipelineJob = (LinkedHashMap<String, Object>) next.getValue();
-    LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) codePipelineJob.get("data");
-
-    logger.info("printing data");
-    logger.info("" + data);
-
-    Object inputArtifacts = data.get("inputArtifacts");
-    logger.info("printing input artifacts");
-
-    logger.info("" + inputArtifacts);
-    logger.info("" + inputArtifacts.getClass());
-
-    List<Object> inputArtifactsList = (List<Object>) inputArtifacts;
-    LinkedHashMap<Object, Object> inputArtifact = (LinkedHashMap<Object, Object>) inputArtifactsList.get(0);
-    LinkedHashMap<Object, Object> location = (LinkedHashMap<Object, Object>) inputArtifact.get("location");
-    LinkedHashMap<Object, Object> s3Location = (LinkedHashMap<Object, Object>) location.get("s3Location");
-
-    String srcBucket = (String) s3Location.get("bucketName");
-    String srcKey = (String) s3Location.get("objectKey");
-    LinkedHashMap<Object, Object> artifactCredentials = (LinkedHashMap<Object, Object>) data.get("artifactCredentials");
-
-    String accessKeyId = (String) artifactCredentials.get("accessKeyId");
-    String secretAccessKey = (String) artifactCredentials.get("secretAccessKey");
-    String sessionToken = (String) artifactCredentials.get("sessionToken");
-
-    File scanDir = awsService.getScanDir(srcBucket, srcKey, accessKeyId, secretAccessKey, sessionToken);
-
-    LinkedHashMap<String, Object> actionConfiguration = (LinkedHashMap<String, Object>) data.get("actionConfiguration");
-    LinkedHashMap<String, Object> configuration = (LinkedHashMap<String, Object>) actionConfiguration.get("configuration");
-
-    String userParametersJson = (String) configuration.get("UserParameters");
-    UserParameters userParameters = new Gson().fromJson(userParametersJson, UserParameters.class);
-
     EvaluationService evaluationService = new EvaluationService();
+
+    CodePipelineJobDto codePipelineJobDto = inputHandlerService.parseCodePipelineJobDto(obj);
+
+    File scanDir = awsService.getScanDir(codePipelineJobDto);
     evaluationService.setAwsService(awsService);
-    evaluationService.setUserParameters(userParameters);
+    evaluationService.setUserParameters(codePipelineJobDto.userParameters);
     evaluationService.setScanDir(scanDir);
+
     ApplicationPolicyEvaluation applicationPolicyEvaluation = evaluationService.eval();
 
     try {
@@ -92,11 +47,10 @@ public class LambdaHandler
     }
 
     // This is where we want to set the job results
-    String jobId = (String) codePipelineJob.get("id");
     List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
     logger.info("Policy alerts size: {}", policyAlerts.size());
 
-    awsService.foo(jobId);
+    awsService.foo(codePipelineJobDto.id);
 
     return null;
   }

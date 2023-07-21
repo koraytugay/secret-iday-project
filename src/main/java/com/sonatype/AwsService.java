@@ -31,11 +31,11 @@ public class AwsService {
     }
   }
 
-  public File getScanDir(String srcBucket, String srcKey, String accessKeyId, String secretAccessKey, String sessionToken) {
-    BasicSessionCredentials awsCredentials = new BasicSessionCredentials(accessKeyId, secretAccessKey, sessionToken);
+  public File getScanDir(CodePipelineJobDto codePipelineJobDto) {
+    BasicSessionCredentials awsCredentials = new BasicSessionCredentials(codePipelineJobDto.accessKeyId, codePipelineJobDto.secretAccessKey, codePipelineJobDto.sessionToken);
     AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
 
-    InputStream s3ObjectInputStream = getObject(s3Client, srcBucket, srcKey);
+    InputStream s3ObjectInputStream = getObject(s3Client, codePipelineJobDto.srcBucket, codePipelineJobDto.srcKey);
     File targetZip;
     try {
       targetZip = File.createTempFile("temp-", ".zip");
