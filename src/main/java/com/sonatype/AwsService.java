@@ -35,7 +35,10 @@ public class AwsService {
     BasicSessionCredentials awsCredentials = new BasicSessionCredentials(codePipelineJobDto.accessKeyId, codePipelineJobDto.secretAccessKey, codePipelineJobDto.sessionToken);
     AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
 
-    InputStream s3ObjectInputStream = getObject(s3Client, codePipelineJobDto.srcBucket, codePipelineJobDto.srcKey);
+    GetObjectRequest getObjectRequest = new GetObjectRequest(codePipelineJobDto.srcBucket, codePipelineJobDto.srcKey);
+    S3Object object = s3Client.getObject(getObjectRequest);
+    InputStream s3ObjectInputStream = object.getObjectContent();
+
     File targetZip;
     try {
       targetZip = File.createTempFile("temp-", ".zip");
@@ -56,7 +59,7 @@ public class AwsService {
     return scanDir;
   }
 
-  public void foo(String jobId) {
+  public void setResults(String jobId) {
     PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
     jobSuccessResultRequest.setJobId(jobId);
     AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
@@ -83,9 +86,4 @@ public class AwsService {
 //    }
   }
 
-  private InputStream getObject(AmazonS3 s3Client, String bucket, String key) {
-    GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
-    S3Object object = s3Client.getObject(getObjectRequest);
-    return object.getObjectContent();
-  }
 }

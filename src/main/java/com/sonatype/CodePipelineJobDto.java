@@ -1,7 +1,5 @@
 package com.sonatype;
 
-import com.sonatype.LambdaHandler.UserParameters;
-
 public class CodePipelineJobDto {
 
   public String id;

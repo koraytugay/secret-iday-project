@@ -15,42 +15,37 @@ import org.slf4j.LoggerFactory;
 public class LambdaHandler
     implements RequestHandler<Object, Void> {
 
-  static class UserParameters {
-
-    public String stage;
-
-    public String applicationId;
-  }
-
   private static final Logger logger = LoggerFactory.getLogger(LambdaHandler.class);
 
   @Override
   public Void handleRequest(Object obj, Context context) {
     logger.info("" + obj);
+
+    // Services
     InputHandlerService inputHandlerService = new InputHandlerService();
     AwsService awsService = new AwsService();
     EvaluationService evaluationService = new EvaluationService();
 
+    // Data we need
     CodePipelineJobDto codePipelineJobDto = inputHandlerService.parseCodePipelineJobDto(obj);
-
     File scanDir = awsService.getScanDir(codePipelineJobDto);
-    evaluationService.setAwsService(awsService);
-    evaluationService.setUserParameters(codePipelineJobDto.userParameters);
-    evaluationService.setScanDir(scanDir);
+    String iqServerCredentials = awsService.getIqServerCredentials();
 
-    ApplicationPolicyEvaluation applicationPolicyEvaluation = evaluationService.eval();
+    // Run eval
+    ApplicationPolicyEvaluation applicationPolicyEvaluation
+        = evaluationService.runEvaluation(iqServerCredentials, codePipelineJobDto, scanDir);
 
+    // Cleanup
     try {
       ZipExtractor.deleteDirectoryWithContent(scanDir);
     } catch (IOException e) {
       logger.info("Could not delete extracted zip files");
     }
 
-    // This is where we want to set the job results
+    // Set results on the job
     List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
     logger.info("Policy alerts size: {}", policyAlerts.size());
-
-    awsService.foo(codePipelineJobDto.id);
+    awsService.setResults(codePipelineJobDto.id);
 
     return null;
   }

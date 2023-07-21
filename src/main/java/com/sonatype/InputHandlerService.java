@@ -1,7 +1,6 @@
 package com.sonatype;
 
 import com.google.gson.Gson;
-import com.sonatype.LambdaHandler.UserParameters;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -35,7 +34,7 @@ public class InputHandlerService {
 
     LinkedHashMap<String, Object> actionConfiguration = (LinkedHashMap<String, Object>) data.get("actionConfiguration");
     LinkedHashMap<String, Object> configuration = (LinkedHashMap<String, Object>) actionConfiguration.get("configuration");
-    String userParametersJson = (String) configuration.get("UserParameters");
+    String userParametersJson = (String) configuration.get("com.sonatype.UserParameters");
     codePipelineJobDto.userParameters = new Gson().fromJson(userParametersJson, UserParameters.class);
 
     return codePipelineJobDto;

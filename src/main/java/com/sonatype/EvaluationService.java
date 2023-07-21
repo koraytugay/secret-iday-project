@@ -1,6 +1,5 @@
 package com.sonatype;
 
-import com.sonatype.LambdaHandler.UserParameters;
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.exception.IqClientException;
@@ -21,13 +20,7 @@ public class EvaluationService {
 
   private static final Logger logger = LoggerFactory.getLogger(EvaluationService.class);
 
-  private AwsService awsService;
-  private UserParameters userParameters;
-  private File scanDir;
-
-  public ApplicationPolicyEvaluation eval() {
-    String iqServerCredentials = awsService.getIqServerCredentials();
-
+  public ApplicationPolicyEvaluation runEvaluation(String iqServerCredentials, CodePipelineJobDto codePipelineJobDto, File scanDir) {
     String iqServerUrl = System.getenv("IQ_SERVER_URL");
     logger.info("iq server url is: {}", iqServerUrl);
 
@@ -51,9 +44,8 @@ public class EvaluationService {
 
     ScanResult scanResult = null;
     try {
-      scanResult = internalIqClient.scan(userParameters.applicationId,
-          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()),
-          new Properties(),
+      scanResult = internalIqClient.scan(codePipelineJobDto.userParameters.applicationId,
+          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()), new Properties(),
           Arrays.asList(scanDir));
     } catch (Exception e) {
       e.printStackTrace();
@@ -64,24 +56,13 @@ public class EvaluationService {
     ApplicationPolicyEvaluation applicationPolicyEvaluation;
     try {
       applicationPolicyEvaluation = internalIqClient.evaluateApplication(
-          userParameters.applicationId, userParameters.stage, scanResult);
+          codePipelineJobDto.userParameters.applicationId, codePipelineJobDto.userParameters.stage,
+          scanResult);
     } catch (IqClientException e) {
-      logger.info("evaluateApplication failed with: " , e.getCause());
+      logger.info("evaluateApplication failed with: ", e.getCause());
       throw new RuntimeException(e);
     }
 
     return applicationPolicyEvaluation;
-  }
-
-  public void setAwsService(AwsService awsService) {
-    this.awsService = awsService;
-  }
-
-  public void setUserParameters(UserParameters userParameters) {
-    this.userParameters = userParameters;
-  }
-
-  public void setScanDir(File scanDir) {
-    this.scanDir = scanDir;
   }
 }
