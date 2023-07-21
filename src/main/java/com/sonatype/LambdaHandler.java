@@ -1,5 +1,6 @@
 package com.sonatype;
 
+import com.amazonaws.services.codepipeline.model.Job;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 // https://github.com/awsdocs/aws-lambda-developer-guide/blob/main/sample-apps/s3-java/src/main/java/example/Handler.java
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/AuthUsingTempSessionToken.html
 public class LambdaHandler
-    implements RequestHandler<Object, String> {
+    implements RequestHandler<Object, Void> {
 
   static class UserParameters {
 
@@ -29,7 +30,8 @@ public class LambdaHandler
   private static final Logger logger = LoggerFactory.getLogger(LambdaHandler.class);
 
   @Override
-  public String handleRequest(Object obj, Context context) {
+  public Void handleRequest(Object obj, Context context) {
+    logger.info("Object: {}", obj);
     AwsService awsService = new AwsService();
 
     LinkedHashMap<Object, Object> input = (LinkedHashMap<Object, Object>) obj;
@@ -96,6 +98,6 @@ public class LambdaHandler
 
     awsService.foo(jobId);
 
-    return "SUCCESS";
+    return null;
   }
 }
