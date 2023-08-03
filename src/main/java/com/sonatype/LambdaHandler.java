@@ -3,10 +3,8 @@ package com.sonatype;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
-import com.sonatype.nexus.api.iq.PolicyAlert;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +36,8 @@ public class LambdaHandler
     ApplicationPolicyEvaluation applicationPolicyEvaluation
         = evaluationService.runEvaluation(iqServerCredentials, codePipelineJobDto, scanDir);
 
+    logger.info("applicationPolicyEvaluation: {}", applicationPolicyEvaluation);
+
     // Cleanup
     try {
       ZipExtractor.deleteDirectoryWithContent(scanDir);
@@ -46,9 +46,7 @@ public class LambdaHandler
     }
 
     // Set results on the job
-    List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
-    logger.info("Policy alerts size: {}", policyAlerts.size());
-    awsService.setResults(codePipelineJobDto.id);
+    awsService.setResults(codePipelineJobDto.id, applicationPolicyEvaluation);
 
     return null;
   }

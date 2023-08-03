@@ -4,22 +4,33 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.services.codepipeline.AWSCodePipeline;
 import com.amazonaws.services.codepipeline.AWSCodePipelineClientBuilder;
+import com.amazonaws.services.codepipeline.model.FailureDetails;
+import com.amazonaws.services.codepipeline.model.FailureType;
+import com.amazonaws.services.codepipeline.model.PutJobFailureResultRequest;
 import com.amazonaws.services.codepipeline.model.PutJobSuccessResultRequest;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.sonatype.nexus.api.iq.Action;
+import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
+import com.sonatype.nexus.api.iq.PolicyAlert;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
 public class AwsService {
+
+  private static final Logger logger = LoggerFactory.getLogger(AwsService.class);
 
   public String getIqServerCredentials() {
     String secretName = System.getenv("IQ_SERVER_CREDENTIALS");
@@ -59,31 +70,38 @@ public class AwsService {
     return scanDir;
   }
 
-  public void setResults(String jobId) {
-    PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
-    jobSuccessResultRequest.setJobId(jobId);
-    AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
-    awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
+  public void setResults(String jobId, ApplicationPolicyEvaluation applicationPolicyEvaluation) {
+    boolean hasFailAction = false;
 
+    List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
+    for (PolicyAlert policyAlert : policyAlerts) {
+      List<? extends Action> actions = policyAlert.getActions();
+      for (Action action : actions) {
+        if (Action.ID_FAIL.equals(action.getActionTypeId())) {
+          hasFailAction = true;
+        }
+      }
+      String policyAlertMessage = policyAlert.getTrigger().toString();
+      policyAlertMessage = policyAlertMessage.replaceAll("\n", " ");
+      logger.info(policyAlertMessage);
+    }
 
-    //    if ("Failure".equalsIgnoreCase(resultDto.policyAction)) {
-//      PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
-//      putJobFailureResultRequest.setJobId(jobId);
-//
-//      FailureDetails failureDetails = new FailureDetails();
-//      failureDetails.setType(FailureType.JobFailed);
-//      failureDetails.setMessage("Failed due to policy violations");
-//      putJobFailureResultRequest.setFailureDetails(failureDetails);
-//
-//      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
-//      awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
-//    }
-//    else {
-//      PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
-//      jobSuccessResultRequest.setJobId(jobId);
-//      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
-//      awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
-//    }
+    if (!hasFailAction) {
+      PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
+      jobSuccessResultRequest.setJobId(jobId);
+      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+      awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
+    } else {
+      PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
+      putJobFailureResultRequest.setJobId(jobId);
+
+      FailureDetails failureDetails = new FailureDetails();
+      failureDetails.setType(FailureType.JobFailed);
+      failureDetails.setMessage("Failed due to policy violations.");
+      putJobFailureResultRequest.setFailureDetails(failureDetails);
+
+      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+      awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
+    }
   }
-
 }
