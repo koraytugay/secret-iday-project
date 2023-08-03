@@ -34,7 +34,7 @@ public class InputHandlerService {
 
     LinkedHashMap<String, Object> actionConfiguration = (LinkedHashMap<String, Object>) data.get("actionConfiguration");
     LinkedHashMap<String, Object> configuration = (LinkedHashMap<String, Object>) actionConfiguration.get("configuration");
-    String userParametersJson = (String) configuration.get("com.sonatype.UserParameters");
+    String userParametersJson = (String) configuration.get("UserParameters");
     codePipelineJobDto.userParameters = new Gson().fromJson(userParametersJson, UserParameters.class);
 
     return codePipelineJobDto;

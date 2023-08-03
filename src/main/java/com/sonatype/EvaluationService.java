@@ -40,7 +40,9 @@ public class EvaluationService {
         .withServerConfig(serverConfig)
         .withLogger(logger)
         .build();
-    logger.info("Created internalIq client..");
+
+    logger.info("Created internalIqClient: {}", internalIqClient);
+    logger.info("scanDir: {}", scanDir);
 
     ScanResult scanResult = null;
     try {
