@@ -9,10 +9,13 @@ import com.sonatype.nexus.api.iq.internal.InternalIqClient;
 import com.sonatype.nexus.api.iq.internal.InternalIqClientBuilder;
 import com.sonatype.nexus.api.iq.scan.ScanResult;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,17 +47,31 @@ public class EvaluationService {
     logger.info("Created internalIqClient: {}", internalIqClient);
     logger.info("scanDir: {}", scanDir);
 
+    Set<String> licensedFeatures = null;
+    try {
+      licensedFeatures = internalIqClient.getLicensedFeatures();
+      logger.info("Retrieved licensed features: {}", licensedFeatures);
+    } catch (IOException e) {
+      logger.info("Failed to get licensed features.", e);
+    }
+
     ScanResult scanResult = null;
     try {
-      scanResult = internalIqClient.scan(codePipelineJobDto.userParameters.applicationId,
-          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()), new Properties(),
-          Arrays.asList(scanDir));
+      scanResult = internalIqClient.scan(
+          codePipelineJobDto.userParameters.applicationId,
+          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()),
+          new Properties(),       // configuration for the scan
+          Arrays.asList(scanDir), // targets
+          scanDir,                // base directory
+          new HashMap<>(),        // env vars
+          licensedFeatures,
+          new ArrayList<>()       // modules
+      );
     } catch (Exception e) {
-      e.printStackTrace();
-      logger.info("Failed with: {}", e.getMessage());
+      logger.info("Scan failed with: {}", e.getMessage());
     }
-    logger.info("Scan result ready.. Calling internalIqClient.evaluateApplication..");
 
+    logger.info("Scan result ready.. Calling internalIqClient.evaluateApplication..");
     ApplicationPolicyEvaluation applicationPolicyEvaluation;
     try {
       applicationPolicyEvaluation = internalIqClient.evaluateApplication(

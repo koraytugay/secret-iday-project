@@ -50,11 +50,6 @@
       <version>3.11.0</version>
     </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>com.sonatype.insight.brain</groupId>-->
-<!--      <artifactId>nexus-iq-cli</artifactId>-->
-<!--      <version>1.164.0-01</version>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>secretsmanager</artifactId>
@@ -76,7 +71,7 @@
     <dependency>
       <groupId>com.sonatype.nexus</groupId>
       <artifactId>nexus-platform-api</artifactId>
-      <version>4.1.4-01</version>
+      <version>4.1.9-SNAPSHOT</version>
     </dependency>
 
     <dependency>
