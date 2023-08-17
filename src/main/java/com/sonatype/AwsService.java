@@ -79,6 +79,7 @@ public class AwsService {
       for (Action action : actions) {
         if (Action.ID_FAIL.equals(action.getActionTypeId())) {
           hasFailAction = true;
+          break;
         }
       }
       String policyAlertMessage = policyAlert.getTrigger().toString();
