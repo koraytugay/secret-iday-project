@@ -1,4 +1,4 @@
-package com.sonatype;
+package com.sonatype.dto;
 
 public class UserParameters {
   public String stage;

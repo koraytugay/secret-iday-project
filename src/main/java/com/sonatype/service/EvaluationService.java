@@ -1,5 +1,6 @@
-package com.sonatype;
+package com.sonatype.service;
 
+import com.sonatype.dto.CodePipelineJobDto;
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.exception.IqClientException;

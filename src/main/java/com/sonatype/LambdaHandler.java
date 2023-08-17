@@ -2,7 +2,12 @@ package com.sonatype;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.sonatype.dto.CodePipelineJobDto;
 import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
+import com.sonatype.service.AwsService;
+import com.sonatype.service.EvaluationService;
+import com.sonatype.service.InputHandlerService;
+import com.sonatype.util.ZipExtractor;
 import java.io.File;
 import java.io.IOException;
 import org.slf4j.Logger;

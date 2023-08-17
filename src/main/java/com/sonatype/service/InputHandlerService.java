@@ -1,6 +1,8 @@
-package com.sonatype;
+package com.sonatype.service;
 
 import com.google.gson.Gson;
+import com.sonatype.dto.CodePipelineJobDto;
+import com.sonatype.dto.UserParameters;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;

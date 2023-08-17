@@ -1,4 +1,4 @@
-package com.sonatype;
+package com.sonatype.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +16,7 @@ import org.apache.commons.io.FileUtils;
 
 public class ZipExtractor
 {
-  static File extract(final File zipFile) throws IOException {
+  public static File extract(final File zipFile) throws IOException {
     Path path = Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), UUID.randomUUID().toString());
     File destDir = Files.createDirectories(path).toFile();
 
@@ -60,8 +60,9 @@ public class ZipExtractor
     return destFile;
   }
 
-  static void deleteDirectoryWithContent(final File dir) throws IOException {
+  public static void deleteDirectoryWithContent(final File dir) throws IOException {
     try (Stream<Path> pathStream = Files.walk(dir.toPath())) {
+      //noinspection ResultOfMethodCallIgnored
       pathStream.sorted(Comparator.reverseOrder())
           .map(Path::toFile)
           .forEach(File::delete);

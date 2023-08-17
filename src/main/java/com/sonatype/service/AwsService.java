@@ -1,4 +1,4 @@
-package com.sonatype;
+package com.sonatype.service;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicSessionCredentials;
@@ -12,9 +12,11 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.sonatype.dto.CodePipelineJobDto;
 import com.sonatype.nexus.api.iq.Action;
 import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
 import com.sonatype.nexus.api.iq.PolicyAlert;
+import com.sonatype.util.ZipExtractor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
