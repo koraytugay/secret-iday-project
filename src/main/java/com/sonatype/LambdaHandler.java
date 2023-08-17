@@ -31,7 +31,6 @@ public class LambdaHandler
 
     // Data we need
     CodePipelineJobDto codePipelineJobDto = inputHandlerService.parseCodePipelineJobDto(obj);
-
     logger.info("codePipelineJobDto: {}", codePipelineJobDto);
 
     File scanDir = awsService.getScanDir(codePipelineJobDto);
