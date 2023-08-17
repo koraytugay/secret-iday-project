@@ -55,17 +55,30 @@ public class EvaluationService {
       logger.info("Failed to get licensed features.", e);
     }
 
+    // todo: support: https://help.sonatype.com/iqserver/integrations/nexus-iq-cli#NexusIQCLI-Parameters
+
+    // todo: can we store the result file somewhere?
+
+    // todo: check app id exists
+//    try {
+//      internalIqClient.verifyOrCreateApplication("", "");
+//    } catch (IqClientException e) {
+//      throw new RuntimeException(e);
+//    }
+
+    // todo: optional organization id should be created if it does not exist already
+    // todo: fail or not, ignoreSystemErrors, failOnPolicyWarnings, ignoreScanningErrors
     ScanResult scanResult = null;
     try {
       scanResult = internalIqClient.scan(
           codePipelineJobDto.userParameters.applicationId,
-          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()),
-          new Properties(),       // configuration for the scan
-          Arrays.asList(scanDir), // targets
+          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()),  // todo: low priority
+          new Properties(),       // configuration for the scan  // todo: to the jvm
+          Arrays.asList(scanDir), // targets (todo: resolve before passing in)
           scanDir,                // base directory
-          new HashMap<>(),        // env vars
+          new HashMap<>(),        // env vars  todo: same with properties
           licensedFeatures,
-          new ArrayList<>()       // modules
+          new ArrayList<>()       // modules  todo: controlled by iqModuleExcludes
       );
     } catch (Exception e) {
       logger.info("Scan failed with: {}", e.getMessage());
