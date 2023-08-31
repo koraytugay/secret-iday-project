@@ -36,9 +36,7 @@ public class EvaluationService {
       return evaluationServiceResultDto;
     }
 
-
     // todo: support: https://help.sonatype.com/iqserver/integrations/nexus-iq-cli#NexusIQCLI-Parameters
-    // todo: can we store the result file somewhere?
     boolean applicationVerified = iqServerService.verifyOrCreateApplication(applicationId, organizationId);
     if (!applicationVerified) {
       evaluationServiceResultDto.applicationVerificationFailed = true;
