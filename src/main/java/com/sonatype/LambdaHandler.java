@@ -26,8 +26,7 @@ public class LambdaHandler
     logger.info("" + obj);
 
     // Setup
-    InputHandlerService inputHandlerService = new InputHandlerService();
-    CodePipelineJobDto codePipelineJobDto = inputHandlerService.parseCodePipelineJobDto(obj);
+    CodePipelineJobDto codePipelineJobDto = new InputHandlerService().parseCodePipelineJobDto(obj);
     AwsService awsService = new AwsService(codePipelineJobDto);
     String iqServerCredentials = awsService.getIqServerCredentials();
     IqServerService iqServerClientService = new IqServerService(iqServerCredentials);
