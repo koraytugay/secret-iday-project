@@ -13,15 +13,11 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.sonatype.dto.CodePipelineJobDto;
-import com.sonatype.nexus.api.iq.Action;
-import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
-import com.sonatype.nexus.api.iq.PolicyAlert;
 import com.sonatype.util.ZipExtractor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,43 +74,11 @@ public class AwsService {
     return scanDir;
   }
 
-  public void setResults(ApplicationPolicyEvaluation applicationPolicyEvaluation) {
-    boolean hasFailAction = false;
-
-    List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
-    for (PolicyAlert policyAlert : policyAlerts) {
-      List<? extends Action> actions = policyAlert.getActions();
-      for (Action action : actions) {
-        if (Action.ID_FAIL.equals(action.getActionTypeId())) {
-          hasFailAction = true;
-          break;
-        }
-      }
-      String policyAlertMessage = policyAlert.getTrigger().toString();
-      policyAlertMessage = policyAlertMessage.replaceAll("\n", " ");
-      logger.info(policyAlertMessage);
-    }
-
-    if (!hasFailAction) {
-      success();
-    } else {
-      fail("Failed due to policy violations");
-    }
-  }
-
-  private void success() {
+  public void success() {
     PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
     jobSuccessResultRequest.setJobId(codePipelineJobDto.id);
     AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
     awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
-  }
-
-  public void failForApplicationValidation() {
-    fail("Could not verify application: " + codePipelineJobDto.userParameters.applicationId);
-  }
-
-  public void failForLicenseFeatures() {
-    fail("Failed to receive license features.");
   }
 
   public void fail(String cause) {
@@ -128,6 +92,5 @@ public class AwsService {
 
     AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
     awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
-
   }
 }

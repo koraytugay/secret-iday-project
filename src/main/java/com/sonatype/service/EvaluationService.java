@@ -46,10 +46,13 @@ public class EvaluationService {
     }
 
     ScanResult scanresult = iqServerService.scan(applicationId, scanDir, licensedFeatures);
+    evaluationServiceResultDto.scanResult = scanresult;
     logger.info("Scan result ready.. Calling internalIqClient.evaluateApplication..");
 
     ApplicationPolicyEvaluation applicationPolicyEvaluation = iqServerService.evaluate(applicationId, stage, scanresult);
     evaluationServiceResultDto.applicationPolicyEvaluation = applicationPolicyEvaluation;
+    evaluationServiceResultDto.hasPolicyViolationsWithFailAction
+        = iqServerService.hasPolicyViolationsWithFailAction(applicationPolicyEvaluation);
 
     return evaluationServiceResultDto;
   }

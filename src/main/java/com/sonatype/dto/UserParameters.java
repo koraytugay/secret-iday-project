@@ -2,8 +2,12 @@ package com.sonatype.dto;
 
 public class UserParameters {
   public String stage;
+
   public String applicationId;
+
   public String organizationId;
+
+  public boolean failBuildOnScanningErrors;
 
   @Override
   public String toString() {
@@ -11,6 +15,7 @@ public class UserParameters {
         "stage='" + stage + '\'' +
         ", applicationId='" + applicationId + '\'' +
         ", organizationId='" + organizationId + '\'' +
+        ", failBuildOnScanningErrors=" + failBuildOnScanningErrors +
         '}';
   }
 }

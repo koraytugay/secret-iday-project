@@ -3,7 +3,9 @@ package com.sonatype.service;
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.exception.IqClientException;
+import com.sonatype.nexus.api.iq.Action;
 import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
+import com.sonatype.nexus.api.iq.PolicyAlert;
 import com.sonatype.nexus.api.iq.ProprietaryConfig;
 import com.sonatype.nexus.api.iq.internal.InternalIqClient;
 import com.sonatype.nexus.api.iq.internal.InternalIqClientBuilder;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -107,5 +110,21 @@ public class IqServerService {
     }
 
     return applicationPolicyEvaluation;
+  }
+
+  public boolean hasPolicyViolationsWithFailAction(ApplicationPolicyEvaluation applicationPolicyEvaluation) {
+    List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
+    for (PolicyAlert policyAlert : policyAlerts) {
+      List<? extends Action> actions = policyAlert.getActions();
+      for (Action action : actions) {
+        if (Action.ID_FAIL.equals(action.getActionTypeId())) {
+          return true;
+        }
+      }
+      String policyAlertMessage = policyAlert.getTrigger().toString();
+      policyAlertMessage = policyAlertMessage.replaceAll("\n", " ");
+      logger.info(policyAlertMessage);
+    }
+    return false;
   }
 }
