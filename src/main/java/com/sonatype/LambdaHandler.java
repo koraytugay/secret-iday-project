@@ -42,14 +42,14 @@ public class LambdaHandler
     File scanDir = awsService.getScanDir();
     EvaluationServiceResultDto evaluationServiceResultDto = evaluationService.runEvaluation(scanDir);
 
-    // Fail if needed due to unexpected conditions
+    // Set outcome in aws
     if (evaluationServiceResultDto.applicationVerificationFailed) {
       awsService.failForApplicationValidation();
     }
-    logger.info("applicationPolicyEvaluation: {}", evaluationServiceResultDto.applicationPolicyEvaluation);
-
-    // Set results on the job
-    awsService.setResults(evaluationServiceResultDto.applicationPolicyEvaluation);
+    else {
+      logger.info("applicationPolicyEvaluation: {}", evaluationServiceResultDto.applicationPolicyEvaluation);
+      awsService.setResults(evaluationServiceResultDto.applicationPolicyEvaluation);
+    }
 
     // Cleanup
     try {
