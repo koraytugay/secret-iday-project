@@ -25,11 +25,16 @@ public class EvaluationService {
   public EvaluationServiceResultDto runEvaluation(File scanDir) {
     logger.info("scanDir: {}", scanDir);
 
-    Set<String> licensedFeatures = iqServerService.getLicensedFeatures();
     String applicationId = userParameters.applicationId;
     String organizationId = userParameters.organizationId;
     String stage = userParameters.stage;
     EvaluationServiceResultDto evaluationServiceResultDto = new EvaluationServiceResultDto();
+
+    Set<String> licensedFeatures = iqServerService.getLicensedFeatures();
+    if (licensedFeatures.isEmpty()) {
+      evaluationServiceResultDto.isLicensedFeaturesEmpty = true;
+      return evaluationServiceResultDto;
+    }
 
 
     // todo: support: https://help.sonatype.com/iqserver/integrations/nexus-iq-cli#NexusIQCLI-Parameters

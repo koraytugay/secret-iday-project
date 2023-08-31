@@ -45,8 +45,9 @@ public class LambdaHandler
     // Set outcome in aws
     if (evaluationServiceResultDto.applicationVerificationFailed) {
       awsService.failForApplicationValidation();
-    }
-    else {
+    } else if (evaluationServiceResultDto.isLicensedFeaturesEmpty) {
+      awsService.failForLicenseFeatures();
+    } else {
       logger.info("applicationPolicyEvaluation: {}", evaluationServiceResultDto.applicationPolicyEvaluation);
       awsService.setResults(evaluationServiceResultDto.applicationPolicyEvaluation);
     }

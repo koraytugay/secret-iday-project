@@ -96,17 +96,25 @@ public class AwsService {
     }
 
     if (!hasFailAction) {
-      PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
-      jobSuccessResultRequest.setJobId(codePipelineJobDto.id);
-      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
-      awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
+      success();
     } else {
       fail("Failed due to policy violations");
     }
   }
 
+  private void success() {
+    PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
+    jobSuccessResultRequest.setJobId(codePipelineJobDto.id);
+    AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+    awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
+  }
+
   public void failForApplicationValidation() {
     fail("Could not verify application: " + codePipelineJobDto.userParameters.applicationId);
+  }
+
+  public void failForLicenseFeatures() {
+    fail("Failed to receive license features.");
   }
 
   public void fail(String cause) {

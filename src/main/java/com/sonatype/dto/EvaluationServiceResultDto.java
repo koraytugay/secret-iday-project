@@ -6,5 +6,7 @@ public class EvaluationServiceResultDto {
 
   public ApplicationPolicyEvaluation applicationPolicyEvaluation;
 
-  public boolean applicationVerificationFailed;
+  public boolean applicationVerificationFailed = false;
+
+  public boolean isLicensedFeaturesEmpty = false;
 }
