@@ -34,6 +34,12 @@ public class AwsService {
 
   private static final Logger logger = LoggerFactory.getLogger(AwsService.class);
 
+  private final CodePipelineJobDto codePipelineJobDto;
+
+  public AwsService(CodePipelineJobDto codePipelineJobDto) {
+    this.codePipelineJobDto = codePipelineJobDto;
+  }
+
   public String getIqServerCredentials() {
     String secretName = System.getenv("IQ_SERVER_CREDENTIALS");
     try (SecretsManagerClient client = SecretsManagerClient.builder().region(Region.US_EAST_1).build()) {
@@ -44,7 +50,7 @@ public class AwsService {
     }
   }
 
-  public File getScanDir(CodePipelineJobDto codePipelineJobDto) {
+  public File getScanDir() {
     BasicSessionCredentials awsCredentials = new BasicSessionCredentials(codePipelineJobDto.accessKeyId, codePipelineJobDto.secretAccessKey, codePipelineJobDto.sessionToken);
     AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
 
@@ -72,7 +78,7 @@ public class AwsService {
     return scanDir;
   }
 
-  public void setResults(String jobId, ApplicationPolicyEvaluation applicationPolicyEvaluation) {
+  public void setResults(ApplicationPolicyEvaluation applicationPolicyEvaluation) {
     boolean hasFailAction = false;
 
     List<PolicyAlert> policyAlerts = applicationPolicyEvaluation.getPolicyAlerts();
@@ -91,20 +97,29 @@ public class AwsService {
 
     if (!hasFailAction) {
       PutJobSuccessResultRequest jobSuccessResultRequest = new PutJobSuccessResultRequest();
-      jobSuccessResultRequest.setJobId(jobId);
+      jobSuccessResultRequest.setJobId(codePipelineJobDto.id);
       AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
       awsCodePipeline.putJobSuccessResult(jobSuccessResultRequest);
     } else {
-      PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
-      putJobFailureResultRequest.setJobId(jobId);
-
-      FailureDetails failureDetails = new FailureDetails();
-      failureDetails.setType(FailureType.JobFailed);
-      failureDetails.setMessage("Failed due to policy violations.");
-      putJobFailureResultRequest.setFailureDetails(failureDetails);
-
-      AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
-      awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
+      fail("Failed due to policy violations");
     }
+  }
+
+  public void failForApplicationValidation() {
+    fail("Could not verify application: " + codePipelineJobDto.userParameters.applicationId);
+  }
+
+  public void fail(String cause) {
+    PutJobFailureResultRequest putJobFailureResultRequest = new PutJobFailureResultRequest();
+    putJobFailureResultRequest.setJobId(codePipelineJobDto.id);
+
+    FailureDetails failureDetails = new FailureDetails();
+    failureDetails.setType(FailureType.JobFailed);
+    failureDetails.setMessage(cause);
+    putJobFailureResultRequest.setFailureDetails(failureDetails);
+
+    AWSCodePipeline awsCodePipeline = AWSCodePipelineClientBuilder.defaultClient();
+    awsCodePipeline.putJobFailureResult(putJobFailureResultRequest);
+
   }
 }

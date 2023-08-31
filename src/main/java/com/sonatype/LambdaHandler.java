@@ -3,10 +3,12 @@ package com.sonatype;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.sonatype.dto.CodePipelineJobDto;
-import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
+import com.sonatype.dto.EvaluationServiceResultDto;
+import com.sonatype.dto.UserParameters;
 import com.sonatype.service.AwsService;
 import com.sonatype.service.EvaluationService;
 import com.sonatype.service.InputHandlerService;
+import com.sonatype.service.IqServerService;
 import com.sonatype.util.ZipExtractor;
 import java.io.File;
 import java.io.IOException;
@@ -24,23 +26,30 @@ public class LambdaHandler
   public Void handleRequest(Object obj, Context context) {
     logger.info("" + obj);
 
-    // Services
+    // Setup
     InputHandlerService inputHandlerService = new InputHandlerService();
-    AwsService awsService = new AwsService();
-    EvaluationService evaluationService = new EvaluationService();
-
-    // Data we need
     CodePipelineJobDto codePipelineJobDto = inputHandlerService.parseCodePipelineJobDto(obj);
-    logger.info("codePipelineJobDto: {}", codePipelineJobDto);
 
-    File scanDir = awsService.getScanDir(codePipelineJobDto);
+    logger.info("codePipelineJobDto: {}", codePipelineJobDto);
+    AwsService awsService = new AwsService(codePipelineJobDto);
     String iqServerCredentials = awsService.getIqServerCredentials();
+    IqServerService iqServerClientService = new IqServerService(iqServerCredentials);
+
+    UserParameters userParameters = codePipelineJobDto.userParameters;
+    EvaluationService evaluationService = new EvaluationService(iqServerClientService, userParameters);
 
     // Run eval
-    ApplicationPolicyEvaluation applicationPolicyEvaluation
-        = evaluationService.runEvaluation(iqServerCredentials, codePipelineJobDto, scanDir);
+    File scanDir = awsService.getScanDir();
+    EvaluationServiceResultDto evaluationServiceResultDto = evaluationService.runEvaluation(scanDir);
 
-    logger.info("applicationPolicyEvaluation: {}", applicationPolicyEvaluation);
+    // Fail if needed due to unexpected conditions
+    if (evaluationServiceResultDto.applicationVerificationFailed) {
+      awsService.failForApplicationValidation();
+    }
+    logger.info("applicationPolicyEvaluation: {}", evaluationServiceResultDto.applicationPolicyEvaluation);
+
+    // Set results on the job
+    awsService.setResults(evaluationServiceResultDto.applicationPolicyEvaluation);
 
     // Cleanup
     try {
@@ -48,9 +57,6 @@ public class LambdaHandler
     } catch (IOException e) {
       logger.info("Could not delete extracted zip files");
     }
-
-    // Set results on the job
-    awsService.setResults(codePipelineJobDto.id, applicationPolicyEvaluation);
 
     return null;
   }
