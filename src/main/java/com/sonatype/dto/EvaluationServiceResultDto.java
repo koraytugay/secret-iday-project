@@ -19,6 +19,6 @@ public class EvaluationServiceResultDto {
     return scanResult != null &&
         scanResult.getScan() != null &&
         scanResult.getScan().getSummary() != null &&
-        scanResult.getScan().getSummary().getErrorCount() > 0
+        scanResult.getScan().getSummary().getErrorCount() > 0;
   }
 }
