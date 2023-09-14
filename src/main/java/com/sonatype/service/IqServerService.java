@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +64,7 @@ public class IqServerService {
     }
   }
 
-  public ScanResult scan(String applicationId, File scanDir, Set<String> licensedFeatures) {
+  public ScanResult scan(String applicationId, List<File> scanTargets, File scanDir, Set<String> licensedFeatures) {
     // todo: fail or not, ignoreSystemErrors, failOnPolicyWarnings, ignoreScanningErrors
     ScanResult scanResult = null;
 
@@ -74,7 +73,7 @@ public class IqServerService {
           applicationId,
           new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()),  // todo: low priority
           new Properties(),       // configuration for the scan  // todo: to the jvm
-          Arrays.asList(scanDir), // targets (todo: resolve before passing in)
+          scanTargets,
           scanDir,                // base directory
           new HashMap<>(),        // env vars  todo: same with properties
           licensedFeatures,
