@@ -68,16 +68,26 @@ public class IqServerService {
     // todo: fail or not, ignoreSystemErrors, failOnPolicyWarnings, ignoreScanningErrors
     ScanResult scanResult = null;
 
+    ProprietaryConfig proprietaryConfig = new ProprietaryConfig(new ArrayList<>(),
+        new ArrayList<>());
+
+    try {
+      proprietaryConfig = internalIqClient.getProprietaryConfigForApplicationEvaluation(applicationId);
+      logger.info("Successfully fetched proprietaryConfig {}", proprietaryConfig);
+    } catch (IqClientException e) {
+      logger.warn("Could not fetch proprietary config for application with id: {}", applicationId);
+    }
+
     try {
       scanResult = internalIqClient.scan(
           applicationId,
-          new ProprietaryConfig(new ArrayList<>(), new ArrayList<>()),  // todo: low priority
-          new Properties(),       // configuration for the scan  // todo: to the jvm
+          proprietaryConfig,
+          new Properties(), // configuration for the scan, properties to the jvm
           scanTargets,
-          scanDir,                // base directory
-          new HashMap<>(),        // env vars  todo: same with properties
+          scanDir,          // base directory
+          new HashMap<>(),  // env vars, similar to properties
           licensedFeatures,
-          new ArrayList<>()       // modules  todo: controlled by iqModuleExcludes
+          new ArrayList<>() // modules  todo: controlled by iqModuleExcludes
       );
     } catch (Exception e) {
       logger.info("Scan failed with: {}", e.getMessage());
