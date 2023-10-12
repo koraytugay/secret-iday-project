@@ -15,6 +15,10 @@ public class EvaluationServiceResultDto {
 
   public ScanResult scanResult;
 
+  public boolean hasNetworkError;
+
+  public boolean iqServerVersionValidationFailed;
+
   public boolean hasScanningErrors() {
     return scanResult != null &&
         scanResult.getScan() != null &&

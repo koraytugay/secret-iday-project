@@ -10,23 +10,26 @@ public class AwsCodePipelineService {
   private final AwsService awsService;
   private final EvaluationService evaluationService;
   private final UserParameters userParameters;
+  private final String iqServerUsername;
   private final String iqServerCredentials;
 
   public AwsCodePipelineService(
       AwsService awsService,
       EvaluationService evaluationService,
       UserParameters userParameters,
+      String iqServerUsername,
       String iqServerCredentials) {
     this.awsService = awsService;
     this.evaluationService = evaluationService;
     this.userParameters = userParameters;
+    this.iqServerUsername = iqServerUsername;
     this.iqServerCredentials = iqServerCredentials;
   }
 
 
   public void handleRequest() {
     // Check if required data is provided
-    if (StringUtils.isBlank(iqServerCredentials)) {
+    if (StringUtils.isBlank(iqServerUsername) || StringUtils.isBlank(iqServerCredentials)) {
       awsService.fail("IQ Server credentials not provided.");
       return;
     }
@@ -36,11 +39,33 @@ public class AwsCodePipelineService {
       return;
     }
 
+    if (userParameters.stage == null) {
+      awsService.fail("Stage is required.");
+      return;
+    }
+
     // Run eval
     File scanDir = awsService.getScanDir();
     EvaluationServiceResultDto evaluationServiceResultDto = evaluationService.runEvaluation(scanDir);
 
     // Set outcome in aws based on the evaluation results
+    if (evaluationServiceResultDto.hasNetworkError && userParameters.failBuildOnNetworkErrors) {
+      awsService.fail("Failed due to IQ Server not being reachable.");
+      return;
+    }
+
+    // At this point `failBuildOnNetworkErrors` is false, so even though IQ is not reachable,
+    // we set the outcome to success..
+    if (evaluationServiceResultDto.hasNetworkError) {
+      awsService.success();
+      return;
+    }
+
+    if (evaluationServiceResultDto.iqServerVersionValidationFailed) {
+      awsService.fail("IQ Server being used must be version 1.60 or later.");
+      return;
+    }
+
     if (evaluationServiceResultDto.hasScanningErrors() && userParameters.failBuildOnScanningErrors) {
       awsService.fail("Failed due to scanning errors.");
       return;

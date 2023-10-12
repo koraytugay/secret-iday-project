@@ -12,6 +12,8 @@ public class UserParameters {
 
   public String scanTargets;
 
+  public boolean failBuildOnNetworkErrors;
+
   @Override
   public String toString() {
     return "UserParameters{" +
@@ -20,6 +22,7 @@ public class UserParameters {
         ", organizationId='" + organizationId + '\'' +
         ", failBuildOnScanningErrors=" + failBuildOnScanningErrors +
         ", scanTargets='" + scanTargets + '\'' +
+        ", failBuildOnNetworkErrors=" + failBuildOnNetworkErrors +
         '}';
   }
 }

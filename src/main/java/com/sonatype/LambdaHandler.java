@@ -28,11 +28,13 @@ public class LambdaHandler
     // Setup
     CodePipelineJobDto codePipelineJobDto = new InputHandlerService().parseCodePipelineJobDto(obj);
     AwsService awsService = new AwsService(codePipelineJobDto);
-    String iqServerCredentials = awsService.getIqServerCredentials();
-    IqServerService iqServerClientService = new IqServerService(iqServerCredentials);
+    String iqServerUsername = System.getenv("IQ_SERVER_USERNAME");
+    String iqServerPassword = awsService.getIqServerPassword();
+    IqServerService iqServerClientService = new IqServerService(iqServerUsername, iqServerPassword);
     UserParameters userParameters = codePipelineJobDto.userParameters;
     EvaluationService evaluationService = new EvaluationService(iqServerClientService, userParameters);
-    AwsCodePipelineService awsCodePipelineService = new AwsCodePipelineService(awsService, evaluationService, userParameters, iqServerCredentials);
+    AwsCodePipelineService awsCodePipelineService = new AwsCodePipelineService(awsService,
+        evaluationService, userParameters, iqServerUsername, iqServerPassword);
 
     awsCodePipelineService.handleRequest();
 

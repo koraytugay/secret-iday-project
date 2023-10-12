@@ -36,13 +36,16 @@ public class AwsService {
     this.codePipelineJobDto = codePipelineJobDto;
   }
 
-  public String getIqServerCredentials() {
-    String secretName = System.getenv("IQ_SERVER_CREDENTIALS");
-    try (SecretsManagerClient client = SecretsManagerClient.builder().region(Region.US_EAST_1).build()) {
+  public String getIqServerPassword() {
+    String region = System.getenv("IQ_SERVER_CREDENTIALS_REGION");
+    Region awsRegion = Region.regions()
+        .stream().filter(r -> r.id().equalsIgnoreCase(region)).findFirst().get();
+    String secretName = System.getenv("IQ_SERVER_PASSWORD");
+    try (SecretsManagerClient client = SecretsManagerClient.builder().region(awsRegion).build()) {
       GetSecretValueRequest getSecretValueRequest = GetSecretValueRequest.builder().secretId(secretName).build();
       GetSecretValueResponse getSecretValueResponse = client.getSecretValue(getSecretValueRequest);
-      String secret = getSecretValueResponse.secretString();
-      return secret;
+      String iqServerPassword = getSecretValueResponse.secretString();
+      return iqServerPassword;
     }
   }
 

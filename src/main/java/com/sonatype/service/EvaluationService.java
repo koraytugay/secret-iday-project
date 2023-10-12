@@ -4,10 +4,16 @@ import com.sonatype.dto.EvaluationServiceResultDto;
 import com.sonatype.dto.UserParameters;
 import com.sonatype.nexus.api.iq.ApplicationPolicyEvaluation;
 import com.sonatype.nexus.api.iq.scan.ScanResult;
+import com.sonatype.nexus.git.utils.repository.RepositoryUrlFinderBuilder;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.codehaus.plexus.util.DirectoryScanner;
@@ -30,13 +36,38 @@ public class EvaluationService {
     this.userParameters = userParameters;
   }
 
+
+  // for debug purposes only
+  private static void getFilesRecursive(File path) {
+    for (File file : path.listFiles()) {
+      if (file.isDirectory()) {
+        getFilesRecursive(file);
+      } else {
+        logger.info(file.getAbsolutePath() + " " + file.getName());
+      }
+    }
+  }
+
   public EvaluationServiceResultDto runEvaluation(File scanDir) {
     logger.info("scanDir: {}", scanDir);
+    // for debug purposes only can and will be removed later TODO
+    getFilesRecursive(scanDir);
 
     String applicationId = userParameters.applicationId;
     String organizationId = userParameters.organizationId;
     String stage = userParameters.stage;
     EvaluationServiceResultDto evaluationServiceResultDto = new EvaluationServiceResultDto();
+
+    Boolean isServerVersionValid = iqServerService.validateServerVersion();
+    if (isServerVersionValid == null) {
+      evaluationServiceResultDto.hasNetworkError = true;
+      return evaluationServiceResultDto;
+    }
+
+    if (!isServerVersionValid) {
+      evaluationServiceResultDto.iqServerVersionValidationFailed = true;
+      return evaluationServiceResultDto;
+    }
 
     Set<String> licensedFeatures = iqServerService.getLicensedFeatures();
     if (licensedFeatures.isEmpty()) {
@@ -44,14 +75,28 @@ public class EvaluationService {
       return evaluationServiceResultDto;
     }
 
-    // todo: support: https://help.sonatype.com/iqserver/integrations/nexus-iq-cli#NexusIQCLI-Parameters
     boolean applicationVerified = iqServerService.verifyOrCreateApplication(applicationId, organizationId);
     if (!applicationVerified) {
       evaluationServiceResultDto.applicationVerificationFailed = true;
       return evaluationServiceResultDto;
     }
 
-    List<File> scanTargets = getScanTargets(scanDir);
+    Optional<String> repositoryUrlOptional = new RepositoryUrlFinderBuilder()
+        .withEnvironmentVariableDefault()
+        .withGitRepoAtPath(scanDir.getAbsolutePath() + "/.git")
+        .withLogger(logger)
+        .build()
+        .tryGetRepositoryUrl();
+
+    if (repositoryUrlOptional.isPresent()) {
+      String repositoryUrl = repositoryUrlOptional.get();
+      iqServerService.addOrUpdateSourceControl(applicationId, repositoryUrl);
+      logger.info("Repository URL found: {}.", repositoryUrl);
+    } else {
+      logger.info("Repository URL not found.");
+    }
+
+      List<File> scanTargets = getScanTargets(scanDir);
     ScanResult scanresult = iqServerService.scan(applicationId, scanTargets, scanDir, licensedFeatures);
     evaluationServiceResultDto.scanResult = scanresult;
     logger.info("Scan result ready.. Calling internalIqClient.evaluateApplication..");

@@ -1,5 +1,6 @@
 package com.sonatype.service;
 
+import com.sonatype.insight.brain.client.UnsupportedServerVersionException;
 import com.sonatype.nexus.api.common.Authentication;
 import com.sonatype.nexus.api.common.ServerConfig;
 import com.sonatype.nexus.api.exception.IqClientException;
@@ -28,20 +29,14 @@ public class IqServerService {
 
   private final InternalIqClient internalIqClient;
 
-  public IqServerService(String iqServerCredentials) {
-    String username = iqServerCredentials.split(":")[0];
-    String password = iqServerCredentials.split(":")[1];
-
-    logger.info("username is:" + username);
-    logger.info("password is:" + password);
-
+  public IqServerService(String iqServerUsername, String iqServerPassword) {
     String iqServerUrl = System.getenv("IQ_SERVER_URL");
     logger.info("iq server url is: {}", iqServerUrl);
 
     URI uri = URI.create(iqServerUrl);
     logger.info("URI created: {}", uri);
 
-    Authentication authentication = new Authentication(username, password.toCharArray());
+    Authentication authentication = new Authentication(iqServerUsername, iqServerPassword.toCharArray());
     ServerConfig serverConfig = new ServerConfig(uri, authentication);
     InternalIqClientBuilder internalIqClientBuilder = InternalIqClientBuilder.create();
 
@@ -64,24 +59,35 @@ public class IqServerService {
     }
   }
 
+  public Boolean validateServerVersion() {
+    try {
+      internalIqClient.validateServerVersion("1.69");
+      return true;
+    } catch (UnsupportedServerVersionException e) {
+      return false;
+    }
+    catch (IqClientException e) {
+      return null;
+    }
+  }
+
   public ScanResult scan(String applicationId, List<File> scanTargets, File scanDir, Set<String> licensedFeatures) {
-    // todo: fail or not, ignoreSystemErrors, failOnPolicyWarnings, ignoreScanningErrors
     ScanResult scanResult = null;
 
-    ProprietaryConfig proprietaryConfig = new ProprietaryConfig(new ArrayList<>(),
-        new ArrayList<>());
+    ProprietaryConfig proprietaryCfg;
 
     try {
-      proprietaryConfig = internalIqClient.getProprietaryConfigForApplicationEvaluation(applicationId);
-      logger.info("Successfully fetched proprietaryConfig {}", proprietaryConfig);
+      proprietaryCfg = internalIqClient.getProprietaryConfigForApplicationEvaluation(applicationId);
+      logger.info("Successfully fetched proprietaryConfig {}", proprietaryCfg);
     } catch (IqClientException e) {
       logger.warn("Could not fetch proprietary config for application with id: {}", applicationId);
+      proprietaryCfg = new ProprietaryConfig(new ArrayList<>(), new ArrayList<>());
     }
 
     try {
       scanResult = internalIqClient.scan(
           applicationId,
-          proprietaryConfig,
+          proprietaryCfg,
           new Properties(), // configuration for the scan, properties to the jvm
           scanTargets,
           scanDir,          // base directory
@@ -135,5 +141,9 @@ public class IqServerService {
       logger.info(policyAlertMessage);
     }
     return false;
+  }
+
+  public void addOrUpdateSourceControl(String applicationId, String repositoryUrl) {
+    internalIqClient.addOrUpdateSourceControl(applicationId, repositoryUrl);
   }
 }
